@@ -5,10 +5,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import cl.web.dto.UsuarioDTO;
+import cl.web.models.Usuario;
 import cl.web.services.UsuarioServiceImpl;
+import jakarta.validation.Valid;
 
 @Controller
 public class WebController {
@@ -50,4 +55,30 @@ public class WebController {
 		model.addAttribute("usuarios", usuarioServiceImpl.findAllUsers());
 		return "admin/admin";
 	}
+	
+	@GetMapping("/registro")
+    public String mostrarRegistroForm(Model model) {
+		UsuarioDTO user = new UsuarioDTO();
+        model.addAttribute("usuario", user);
+        return "register";
+    }
+	
+    @PostMapping("/registro")
+    public String registro_guardar(@Valid @ModelAttribute("usuario") UsuarioDTO usuarioDto,
+                                   BindingResult result,
+                                   Model model) {
+
+        Usuario existeUsername = usuarioServiceImpl.findByUsername(usuarioDto.getUsername());
+        if (existeUsername != null) {
+            result.rejectValue("username", null, "Nombre de usuario ya está en uso");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("usuario", usuarioDto);
+            return "register";
+        }
+
+        usuarioServiceImpl.saveUser(usuarioDto);
+        return "redirect:/login";
+    }
 }

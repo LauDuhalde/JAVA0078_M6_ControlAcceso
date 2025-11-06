@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UsuarioDTO {
     
-    @NotEmpty(message = "username no puede estar vacio")
+    @NotEmpty(message = "Username no puede estar vacio")
     private String username;
     
     @NotEmpty(message = "Password no puede estar vacio")
