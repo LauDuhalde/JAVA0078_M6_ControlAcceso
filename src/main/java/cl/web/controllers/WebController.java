@@ -15,6 +15,9 @@ import cl.web.models.Usuario;
 import cl.web.services.UsuarioServiceImpl;
 import jakarta.validation.Valid;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 public class WebController {
 
@@ -50,11 +53,22 @@ public class WebController {
 		return "perfil/perfil";
 	}
 	
-	@GetMapping("/admin")
-	public String detalleAdmin(Model model) {
-		model.addAttribute("usuarios", usuarioServiceImpl.findAllUsers());
-		return "admin/admin";
-	}
+//	@GetMapping("/admin")
+//	public String detalleAdmin(Model model) {
+//		model.addAttribute("usuarios", usuarioServiceImpl.findAllUsers());
+//		return "admin/admin";
+//	}
+    @GetMapping("/admin")
+    public String detalleAdmin(Model model) {
+    // Obtener todos los usuarios como entidades Usuario
+    List<Usuario> usuarios = usuarioServiceImpl.findAllUsers()
+            .stream()
+            .map(dto -> usuarioServiceImpl.findByUsername(dto.getUsername()))
+            .collect(Collectors.toList());
+
+    model.addAttribute("usuarios", usuarios);
+    return "admin/admin";
+}
 	
 	@GetMapping("/registro")
     public String mostrarRegistroForm(Model model) {
